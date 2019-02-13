@@ -31,7 +31,7 @@ satisfen :: Estado -> Prop -> Bool
 satisfen = interp
 
 satisf :: Prop -> Bool
-satif phi = modelos phi /= []
+satisf phi = modelos phi /= []
 
 insatifen :: Estado -> Prop -> Bool
 insatifen e phi = not (satisfen e phi)
@@ -41,20 +41,20 @@ contrad :: Prop -> Bool
 contrad phi = modelos phi == []
 
 pega :: [Prop] -> Prop
-pega [] = True
+pega [] = TTrue
 pega [x] = x
 pega (x:xs) = Conj x (pega xs)
 
-estadosConj :: [Prop] -> [Estados]
+estadosConj :: [Prop] -> [Estado]
 estadosConj l = estados (pega l)
 
-insatisfConj :: [Prop] -> Boll
+insatisfConj :: [Prop] -> Bool
 insatisfConj l = contrad (pega l)
 
 -- 4.
 
 equiv :: Prop -> Prop -> Bool
-equip pq = tautologia (Equiv p q)
+equiv p q = tautologia (Conj p q)
 
 
 --5.
@@ -63,7 +63,7 @@ consecuencia :: [Prop] -> Prop -> Bool
 consecuencia gamma phi = insatisfConj(Neg(phi):gamma)
 
 argcorrecto :: [Prop] -> Prop -> Bool
-argcorrecto = consecuencia 
+argcorrecto = consecuencia
 
 --Auxiliares
 
