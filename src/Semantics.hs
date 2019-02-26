@@ -1,4 +1,4 @@
-module Semantic where
+module Semantics where
 
 import Syntax
 import Data.List
@@ -14,12 +14,14 @@ interp e phi = case phi of
   Conj p q -> (interp e p) || (interp e q)
   Disy p q -> (interp e p) && (interp e q)
   Imp p q -> not (interp e p) || (interp e q)
-  Equiv p q -> not (interp e p) == (interp e q)
+  Equiv p q -> (interp e p) == (interp e q)
+
 
 estados :: Prop -> [Estado]
-estados phi = subconj(vars phi)
+estados phi = subconj (vars phi)
 
--- 3. Conseptos semanticos
+
+-- Conceptos semánticos
 
 modelos :: Prop -> [Estado]
 modelos phi = [e | e <- estados phi, interp e phi]
@@ -33,9 +35,8 @@ satisfen = interp
 satisf :: Prop -> Bool
 satisf phi = modelos phi /= []
 
-insatifen :: Estado -> Prop -> Bool
-insatifen e phi = not (satisfen e phi)
-
+insatisfen :: Estado -> Prop -> Bool
+insatisfen e phi = not (satisfen e phi)
 
 contrad :: Prop -> Bool
 contrad phi = modelos phi == []
@@ -51,21 +52,20 @@ estadosConj l = estados (pega l)
 insatisfConj :: [Prop] -> Bool
 insatisfConj l = contrad (pega l)
 
--- 4.
+-- 4. Equivalencia de Formulas
 
 equiv :: Prop -> Prop -> Bool
 equiv p q = tautologia (Conj p q)
 
-
---5.
+-- 5. Consecuencias logicas
 
 consecuencia :: [Prop] -> Prop -> Bool
-consecuencia gamma phi = insatisfConj(Neg(phi):gamma)
+consecuencia gamma phi = insatisfConj (Neg(phi):gamma)
 
 argcorrecto :: [Prop] -> Prop -> Bool
-argcorrecto = consecuencia
+argcorrecto gamma phi = consecuencia gamma phi
 
---Auxiliares
+-- Auxiliares
 
 vars :: Prop -> [VarP]
 vars phi = case phi of
@@ -73,14 +73,12 @@ vars phi = case phi of
   FFalse -> []
   V x -> [x]
   Neg p -> vars p
-  Conj p q -> union (vars p) (vars q)
-  Disy p q -> union (vars p) (vars q)
-  Imp p q ->  union (vars p) (vars q)
+  Conj p q-> union (vars p) (vars q)
+  Disy p q-> union (vars p) (vars q)
+  Imp p q-> union (vars p) (vars q)
   Equiv p q -> union (vars p) (vars q)
 
 subconj :: [a] -> [[a]]
 subconj [] = [[]]
 subconj (x:xs) = xs' ++ map (x:) xs'
--- map aplica x: a cada elemento de xs'
--- x: funcion que recibe otra lista y concatena x al inicio cada elemento de la lista
-  where xs' = subconj xs
+    where xs' = subconj xs
